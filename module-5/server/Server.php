@@ -50,16 +50,24 @@ class Server
 	{
 		$key = $this->getCryptoKey();
 
-		// @TODO Use LibSodium to encrypt the note.
-		return $plaintextNote;
+        //Using LibSodium to encrypt
+        $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        $encrypted = sodium_crypto_secretbox($plaintextNote, $nonce, $key);
+        $joined = $nonce . $encrypted;
+        return bin2hex($joined);
 	}
 
 	private function decryptNote(string $ciphertextNote): string
 	{
 		$key = $this->getCryptoKey();
+        
+        // Using libSodium to decrypt
+        $joined = hex2bin($ciphertextNote);
+        $nonce = substr($joined, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        $encrypted = substr($joined, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        $plaintext = sodium_crypto_secretbox_open($encrypted, $nonce, $key);
 
-		// @TODO Use LibSodium to decrypt an encrypted note.
-		return $ciphertextNote;
+		return $plaintext;
 	}
 
 	public function getNotes(ServerRequestInterface $request): array
