@@ -112,7 +112,7 @@ class Server
 			// Create the user when we throw a not found exception!
 			$user = new BaseUser();
 			$user->email = $parsed['email'];
-			$user->password = $parsed['password']; // @TODO This should be hashed!
+			$user->password = password_hash($parsed['password'], PASSWORD_DEFAULT);
 			$user->greeting = isset($parsed['greeting']) ? $parsed['greeting'] : 'Friend';
 
 			$userId = $this->db->createUser($user);
@@ -140,8 +140,7 @@ class Server
 			throw new BadRequestException('No such user!');
 		}
 
-		// @TODO Use better comparisons
-		if (!hash_equals($user->password, $parsed['old_password'])) {
+		if (!password_verify($user->password, $parsed['old_password'])) {
 			throw new BadRequestException('Invalid password!');
 		}
 
@@ -149,8 +148,7 @@ class Server
 			throw new BadRequestException('Passwords must match!');
 		}
 
-		// @TODO This should be hashed!
-		$user->password = $parsed['new_password'];
+		$user->password = password_hash($parsed['new_password'], PASSWORD_DEFAULT);
 
 		if ($this->db->updateUserPassword($user)) {
 			return new EmptyResponse();

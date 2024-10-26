@@ -21,8 +21,7 @@ class AuthMiddleware implements MiddlewareInterface
 		try {
 			$user = $db->getUserByEmail($decoded[0]);
 
-			// @TODO Proper hash comparison
-			if (hash_equals($user->password, $decoded[1])) {
+			if (password_verify($user->password, $decoded[1])) {
 				if (session_status() !== PHP_SESSION_ACTIVE) {
 					session_start();
 				}
