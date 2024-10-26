@@ -15,10 +15,19 @@ class AuthMiddleware implements MiddlewareInterface
 		if (Server::authenticate($request)) {
 			return $handler->handle($request);
 		}
-
-		// @TODO Check for a Bearer token and set up the session
-		$authorization = $request->getHeader('authorization')[0];
-
+        
+        $authorization = $request->getHeader('authorization')[0];
+        $authParts = explode(' ', $authorization);
+        if ($authParts[0] === 'Bearer') {
+            session_id($authParts[1]);
+            session_start();
+            
+            if (!empty($_SESSION['userId'])) {
+                return $handler->handle($request);
+            }
+        }
+        
+        
 		throw new ForbiddenException();
 	}
 }

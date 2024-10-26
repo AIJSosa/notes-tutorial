@@ -73,11 +73,11 @@ class Module3 extends CLI
 			'POST',
 			'notes', [
 			'body' => json_encode($jsonBody),
-			'auth' => [$this->user, $this->pass] // @TODO Replace basic auth with Bearer auth
+			'authorization' => 'Bearer ' . $this->token
 		]);
 
 		if ($response->getStatusCode() === 200) {
-			$return = json_decode($response->getBody(), true);
+			$return = json_defcode($response->getBody(), true);
 
 			$this->info(sprintf('Created note ID %s', $return['noteId']));
 		}
@@ -124,7 +124,7 @@ class Module3 extends CLI
 		$response = $this->client->request(
 			'GET',
 			sprintf('notes/%s', $noteId),
-			['auth' => [$this->user, $this->pass]] // @TODO Replace basic auth with Bearer auth
+			['authorization' => 'Bearer ' . $this->token]
 		);
 
 		if ($response->getStatusCode() === 200) {
@@ -146,7 +146,7 @@ class Module3 extends CLI
 			$this->client->request(
 				'DELETE',
 				sprintf('notes/%s', $noteId),
-				['auth' => [$this->user, $this->pass]] // @TODO Replace basic auth with Bearer auth
+				['authorization' => 'Bearer ' . $this->token]
 			);
 			$this->info(sprintf('Note ID %s has been deleted.', $noteId));
 		} catch (\GuzzleHttp\Exception\BadResponseException $e) {
@@ -159,7 +159,7 @@ class Module3 extends CLI
 		$response = $this->client->request(
 			'GET',
 			'notes',
-			['auth' => [$this->user, $this->pass]] // @TODO Replace basic auth with Bearer auth
+			['authorization' => 'Bearer ' . $this->token]
 		);
 
 		if ($response->getStatusCode() === 200) {
@@ -267,6 +267,7 @@ class Module3 extends CLI
 	protected function login(Options $options): void
 	{
 		try {
+            // Not edited, is initial token. Returns token from Server
 			$response = $this->client->request('GET', 'login', ['auth' => [$this->user, $this->pass]]);
 
 			if ($response->getStatusCode() === 200) {
