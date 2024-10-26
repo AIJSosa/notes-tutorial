@@ -59,8 +59,8 @@ class Server
 		$parsed = $this->getParsedBody($request);
 		$contents = $parsed['note'];
 
-		// @TODO Ensure the note is sanitized!
-
+        $contents = filter_var($contents, FILTER_SANITIZE_STRING);
+        
 		if (empty($contents)) {
 			throw new BadRequestException();
 		}
@@ -109,8 +109,10 @@ class Server
 			throw new BadRequestException('Passwords must match!');
 		}
 
-		// @TODO Ensure we're working with a valid email first!
-
+        if (!filter_var($parsed['email'], FILTER_VALIDATE_EMAIL)) {
+            throw new BadRequestException('Invalid email!');
+        }
+        
 		// Check for duplicate user
 		try {
 			$existing = $this->db->getUserByEmail($parsed['email']);
