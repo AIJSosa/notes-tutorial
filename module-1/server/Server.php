@@ -19,8 +19,8 @@ class Server
 	{
 		$this->db = new Database();
 
-		// @TODO Load this from the environment!
-		$this->user = 'f6d38011-7d70-4852-914e-8406d12f08a1';
+        $hardUserId = require_once(dirname(__FILE__).'/../config.php')['hard_user_id'];
+		$this->user = $hardUserId;
 	}
 
 	public function getNotes(ServerRequestInterface $request): array
